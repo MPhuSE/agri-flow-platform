@@ -76,8 +76,20 @@ class AuthService {
 
   // ================= LOGOUT =================
   async logout() {
-    await supabase.auth.signOut()
-    return { success: true }
+    // await supabase.auth.signOut()
+    // return { success: true }
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Lỗi khi gọi logout server:", error.message);
+    } finally {
+    // Luôn dọn dẹp dữ liệu dù logout thành công hay thất bại
+    localStorage.removeItem('full_name');
+    localStorage.clear();
+    // Buộc trình duyệt xóa các cookie/session cũ của Supabase
+    window.location.href = '/login'; 
+    }
+    return { success: true };
   }
 
   // ================= CURRENT USER =================
