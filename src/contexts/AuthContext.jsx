@@ -37,17 +37,20 @@ export const AuthProvider = ({ children }) => {
     });
 
     // 2. Lắng nghe thay đổi Auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        setUser(session.user);
-        fetchProfile(session.user.id);
-      } else {
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
-        if (event === 'SIGNED_OUT') localStorage.clear();
-      }
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' || (event === 'INITIAL_SESSION' && session)) {
+            setUser(session.user);
+            await fetchProfile(session.user.id);
+      } else if (event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+          setUser(null);
+          setProfile(null);
+          localStorage.clear();
+          setLoading(false);
+      } else if (!session) {
+    // Trường hợp session hỏng hoặc không tồn tại (tránh lỗi session_not_found)
+         setLoading(false);
+     }
+  });
 
     return () => subscription.unsubscribe();
   }, []);
