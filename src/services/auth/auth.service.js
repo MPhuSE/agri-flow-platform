@@ -84,7 +84,6 @@ class AuthService {
       console.error("Lỗi khi gọi logout server:", error.message);
     } finally {
     // Luôn dọn dẹp dữ liệu dù logout thành công hay thất bại
-    localStorage.removeItem('full_name');
     localStorage.clear();
     // Buộc trình duyệt xóa các cookie/session cũ của Supabase
     window.location.href = '/login'; 
